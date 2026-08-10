@@ -1,0 +1,222 @@
+const player = document.getElementById("player");
+
+const enemy1 = document.getElementById("enemy1");
+const enemy2 = document.getElementById("enemy2");
+
+const scoreElement = document.getElementById("score");
+
+const message = document.getElementById("message");
+
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+const gameArea = document.getElementById("gameArea");
+
+let playerPosition = 145;
+
+let enemy1Position = -70;
+let enemy2Position = -250;
+
+let score = 0;
+
+let gameRunning = false;
+
+let gameSpeed = 5;
+
+let gameLoop;
+
+
+/* Start Game */
+
+startBtn.addEventListener("click", startGame);
+
+
+/* Restart Game */
+
+restartBtn.addEventListener("click", restartGame);
+
+
+/* Keyboard Controls */
+
+document.addEventListener("keydown", function(event) {
+
+    if (!gameRunning) {
+        return;
+    }
+
+    if (event.key === "ArrowLeft") {
+
+        if (playerPosition > 10) {
+
+            playerPosition -= 25;
+
+            player.style.left = playerPosition + "px";
+        }
+    }
+
+    if (event.key === "ArrowRight") {
+
+        if (playerPosition < 295) {
+
+            playerPosition += 25;
+
+            player.style.left = playerPosition + "px";
+        }
+    }
+
+});
+
+
+/* Start Function */
+
+function startGame() {
+
+    if (gameRunning) {
+        return;
+    }
+
+    gameRunning = true;
+
+    score = 0;
+
+    gameSpeed = 5;
+
+    scoreElement.textContent = score;
+
+    message.textContent = "Use ⬅️ ➡️ Arrow Keys";
+
+    enemy1Position = -70;
+
+    enemy2Position = -300;
+
+    gameLoop = setInterval(updateGame, 20);
+}
+
+
+/* Game Update */
+
+function updateGame() {
+
+    enemy1Position += gameSpeed;
+
+    enemy2Position += gameSpeed;
+
+
+    enemy1.style.top = enemy1Position + "px";
+
+    enemy2.style.top = enemy2Position + "px";
+
+
+    /* Enemy 1 */
+
+    if (enemy1Position > 600) {
+
+        enemy1Position = -70;
+
+        score++;
+
+        scoreElement.textContent = score;
+
+        increaseSpeed();
+    }
+
+
+    /* Enemy 2 */
+
+    if (enemy2Position > 600) {
+
+        enemy2Position = -70;
+
+        score++;
+
+        scoreElement.textContent = score;
+
+        increaseSpeed();
+    }
+
+
+    /* Collision */
+
+    if (checkCollision(player, enemy1)) {
+
+        gameOver();
+    }
+
+
+    if (checkCollision(player, enemy2)) {
+
+        gameOver();
+    }
+
+}
+
+
+/* Collision Function */
+
+function checkCollision(player, enemy) {
+
+    const playerRect = player.getBoundingClientRect();
+
+    const enemyRect = enemy.getBoundingClientRect();
+
+    return !(
+        playerRect.bottom < enemyRect.top ||
+        playerRect.top > enemyRect.bottom ||
+        playerRect.right < enemyRect.left ||
+        playerRect.left > enemyRect.right
+    );
+}
+
+
+/* Increase Speed */
+
+function increaseSpeed() {
+
+    if (score % 5 === 0) {
+
+        gameSpeed += 1;
+    }
+}
+
+
+/* Game Over */
+
+function gameOver() {
+
+    clearInterval(gameLoop);
+
+    gameRunning = false;
+
+    message.textContent =
+        "💥 GAME OVER! Your Score: " + score;
+}
+
+
+/* Restart */
+
+function restartGame() {
+
+    clearInterval(gameLoop);
+
+    gameRunning = false;
+
+    playerPosition = 145;
+
+    player.style.left = playerPosition + "px";
+
+    enemy1Position = -70;
+
+    enemy2Position = -300;
+
+    enemy1.style.top = enemy1Position + "px";
+
+    enemy2.style.top = enemy2Position + "px";
+
+    score = 0;
+
+    gameSpeed = 5;
+
+    scoreElement.textContent = score;
+
+    message.textContent = "Press Start Game";
+}
